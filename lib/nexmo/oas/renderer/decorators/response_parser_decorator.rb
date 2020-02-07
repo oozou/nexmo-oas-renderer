@@ -35,7 +35,7 @@ module Nexmo
           formatter = Rouge::Formatters::HTML.new
 
           case format
-          when 'application/json'
+          when 'application/json', 'application/vnd.api+json'
             lexer = Rouge::Lexer.find('json')
             highlighted_response = formatter.format(lexer.lex(formatted_json))
           when 'text/xml', 'application/xml'
@@ -44,6 +44,7 @@ module Nexmo
           end
 
           output = <<~HEREDOC
+      <span class="Vlt-badge Vlt-badge">#{format}</span>
       <pre class="highlight json"><code>#{highlighted_response}</code></pre>
           HEREDOC
 
