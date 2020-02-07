@@ -18,24 +18,29 @@
           <% if definition.info['description'] %>
             <p><%= definition.info['description'].render_markdown %></p>
           <% end %>
-
-          <div class="Vlt-grid">
-            <div class="Vlt-col">
-              <a href=<%= url("#{request.url}.#{definition.format}", params: request.params) %> class='Vlt-btn Vlt-btn--secondary Vlt-btn--app'>
-                <svg><use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-download" /></svg>
-                Download OpenAPI 3 Definition
-              </a>
-            </div>
-            <div class="Vlt-col Vlt-right">
-              <a href="https://github.com/Nexmo/api-specification/blob/master/definitions/<%= @specification.definition_name %>.yml" class='Vlt-btn Vlt-btn--tertiary Vlt-btn--app Vlt-right'>
-                <svg className="Vlt-icon Vlt-black">
-                  <use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-github" />
-                </svg>
-                Improve this specification
-              </a>
-            </div>
-          </div>
         </div>
+
+        <% if (servers = @specification.definition.servers).size > 1 %>
+          <h4>There are multiple servers available</h4>
+          <div class="Vlt-dropdown">
+            <button class="Vlt-dropdown__btn">
+              Choose a server
+            </button>
+            <div class="Vlt-dropdown__panel">
+              <div class="Vlt-dropdown__panel__content">
+                <ul>
+                  <% servers.each_with_index do |server, index| %>
+                    <% active = 'Vlt-dropdown__link--active' if params[:server_index].nil? ? index.zero? : params[:server_index].to_i == index %>
+                    <li><a class="<%= active %> Vlt-dropdown__link" href='?server_index=<%= index %>'><%= server['description'] %></span></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <br>
+        <br>
+
       </div>
       <div class="Vlt-col Vlt-col--1of3 Nxd-api__code Nxd-api__code--install">
 
