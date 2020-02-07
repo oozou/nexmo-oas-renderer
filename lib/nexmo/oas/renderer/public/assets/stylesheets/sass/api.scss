@@ -65,6 +65,16 @@
     position: sticky;
     display: block;
     overflow: scroll;
+
+    .js-format .Vlt-badge {
+      z-index: 99;
+      position: relative;
+      margin-left: 10px;
+
+      + pre {
+        margin-top: -10px;
+      }
+    }
   }
 
   &__code {
