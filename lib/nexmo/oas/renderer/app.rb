@@ -30,7 +30,12 @@ module Nexmo
         set :views, view_paths
 
         set :mustermann_opts, { type: :rails }
-        set :oas_path, (ENV['OAS_PATH'] || './')
+        require 'pry'; binding.pry
+        set :oas_path, (
+          ENV['OAS_PATH'] ||
+            Rails.application.try(:credentials).try(:fetch, :oas_path, nil) ||
+            './'
+        )
         set :bind, '0.0.0.0'
 
         helpers do
