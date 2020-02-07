@@ -1,9 +1,6 @@
 require "nexmo/oas/renderer/version"
 require "nexmo/oas/renderer/app"
-
-if defined?(NexmoDeveloper::Application)
-  require "nexmo/oas/engine"
-end
+require "nexmo/oas/engine"
 
 module Nexmo
   module OAS

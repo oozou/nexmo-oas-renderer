@@ -26,10 +26,8 @@ module Nexmo
 
         Tilt.register Tilt::ERBTemplate, 'html.erb'
 
-        if defined?(NexmoDeveloper::Application)
-          view_paths = [views, NexmoDeveloper::Application.root.join("app", "views")]
-          set :views, view_paths
-        end
+        view_paths = [views, Rails.root.join("app", "views")]
+        set :views, view_paths
 
         set :mustermann_opts, { type: :rails }
         set :oas_path, (ENV['OAS_PATH'] || './')
@@ -61,35 +59,20 @@ module Nexmo
         end
 
         def check_redirect!
-          if defined?(NexmoDeveloper::Application)
-            redirect_path = Redirector.find(request)
-            redirect(redirect_path) if redirect_path
-          end
+          return
         end
 
         def check_oas_constraints!(definition)
-          if defined?(NexmoDeveloper::Application)
-            pass unless OpenApiConstraint.match?(definition)
-          end
+          return
         end
 
         error Errno::ENOENT do
-          layout = defined?(NexmoDeveloper::Application) ? :'layouts/api.html' : false
+          layout = :'layouts/api.html'
           not_found erb :'static/404', layout: layout
         end
 
         error Exception do
           File.read("#{API.root}/public/500.html")
-        end
-
-        unless defined?(NexmoDeveloper::Application)
-          get '/' do
-            prefix = "#{API.oas_path}"
-            @definitions = Dir.glob("#{prefix}/**/*.yml").map do |d|
-              d.gsub("#{prefix}/", '').gsub('.yml', '')
-            end.sort.reject { |d| d.include? 'common/' }
-            erb :'api/index', layout: false
-          end
         end
 
         def set_code_language
@@ -116,11 +99,7 @@ module Nexmo
           if ['yml', 'json'].include?(parameters[:format])
             send_file @specification.definition.path, disposition: :attachment
           else
-            if defined?(NexmoDeveloper::Application)
-              erb :'open_api/show', layout: :'layouts/page-full.html'
-            else
-              erb :'open_api/show', layout: :'layouts/open_api'
-            end
+            erb :'open_api/show', layout: :'layouts/open_api'
           end
         end
 
@@ -149,14 +128,10 @@ module Nexmo
             title: @specification.side_navigation_title,
           )
 
-          if defined?(NexmoDeveloper::Application)
-            @content = @navigation.content
-            @side_navigation_title = @navigation.title
+          @content = @navigation.content
+          @side_navigation_title = @navigation.title
 
-            erb :'api/show', layout: :'layouts/api.html'
-          else
-            erb :'api/show', layout: :'layouts/api'
-          end
+          erb :'api/show', layout: :'layouts/api.html'
         end
       end
     end
