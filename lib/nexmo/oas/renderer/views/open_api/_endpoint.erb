@@ -97,11 +97,32 @@
     <%= erb :'open_api/_code_examples', locals: { endpoint: endpoint } %>
 
     <div class='Nxd-api__responses'>
+      <% if (request_body = endpoint.request_body.presence&.content) %>
+        <h3>Requests</h3>
+        <% expand_response = true %>
+        <div class="Vlt-accordion">
+          <button tabindex="0" class="Vlt-accordion__trigger <%= expand_response ? 'Vlt-accordion__trigger_active' : '' %>">
+            <h5 class="Vlt-title--nomargin">HTTP request</h5>
+          </button>
+
+          <div class="Vlt-accordion__content <%= expand_response ? 'Vlt-accordion__content_open' : '' %>">
+            <% request_body.keys.each_with_index do |format, index| %>
+              <div class="js-format" data-format="<%= format %>">
+                <% schema = request_body[format]['schema'] %>
+                <%= Nexmo::OAS::Renderer::ResponseParserDecorator.new(schema).html(format, xml_options: schema['xml']) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if endpoint.responses.present? %>
+        <h3>Responses</h3>
+      <% end %>
       <% endpoint.responses.each do |response| %>
         <%
-          id = SecureRandom.hex
           expand_response = response.code[0] == '2' && response.raw['x-expand-response'] != false
-          expand_response = true if response.raw['x-expand-response']
+          expand_response ||= true if response.raw['x-expand-response']
         %>
 
         <div class="Vlt-accordion">
