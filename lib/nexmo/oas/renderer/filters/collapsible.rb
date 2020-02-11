@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,8 +7,8 @@ module Nexmo
         class Collapsible < Banzai::Filter
           def call(input)
             input.gsub(/^\|\s(\#{1,6})(\s)?(.+?)\n^\|\n(.+?)\n\n/m) do |_s|
-              heading = $3
-              body = $4.gsub(/^\|\n/, "\n")
+              heading = Regexp.last_match(3)
+              body = Regexp.last_match(4).gsub(/^\|\n/, "\n")
               body = body.gsub(/^\|\s/, '')
               parsed_body = MarkdownPipeline.new.call(body)
 

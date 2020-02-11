@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../models/tutorial'
 require 'banzai'
 require 'yaml'
@@ -9,7 +11,7 @@ module Nexmo
         class Tutorials < Banzai::Filter
           def call(input)
             input.gsub(/```tutorials(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
               @product = config['product']
               @tutorials = Models::Tutorial.by_product(@product)
 

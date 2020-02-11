@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -8,7 +10,7 @@ module Nexmo
             input.gsub(/````\n(.+?)````/m) do |_s|
               lexer = Rouge::Lexer.find('text')
               formatter = Rouge::Formatters::HTML.new
-              highlighted_source = formatter.format(lexer.lex($1))
+              highlighted_source = formatter.format(lexer.lex(Regexp.last_match(1)))
 
               output = <<~HEREDOC
                 <pre class="highlight #{lexer.tag}"><code>#{highlighted_source}</code></pre>

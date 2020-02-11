@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -8,13 +10,15 @@ module Nexmo
 
             input.gsub!(/@\[(.+?)\]\((.+?)\)/) do |_s|
               id = 'M' + SecureRandom.hex(12)
-              modals << { document: $2, id: id }
-              "<a href='javascript:void(0)' data-modal='#{id}' class='Vlt-modal-trigger Vlt-text-link'>#{$1}</a>"
+              modals << { document: Regexp.last_match(2), id: id }
+              "<a href='javascript:void(0)' data-modal='#{id}' class='Vlt-modal-trigger Vlt-text-link'>#{Regexp.last_match(1)}</a>"
             end
 
             modals = modals.map do |modal|
               filename = modal[:document]
-              raise "Could not find modal #{filename}" unless File.exist? filename
+              unless File.exist? filename
+                raise "Could not find modal #{filename}"
+              end
 
               document = File.read(filename)
               output = MarkdownPipeline.new.call(document)

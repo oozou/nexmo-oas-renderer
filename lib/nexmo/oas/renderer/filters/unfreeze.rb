@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -9,7 +11,7 @@ module Nexmo
             input.gsub!('FREEZEEND</p>', 'FREEZEEND')
 
             input.gsub!(/FREEZESTART(.+?)FREEZEEND/m) do |_s|
-              Base64.urlsafe_decode64($1).force_encoding(Encoding::UTF_8)
+              Base64.urlsafe_decode64(Regexp.last_match(1)).force_encoding(Encoding::UTF_8)
             end
             input
           end

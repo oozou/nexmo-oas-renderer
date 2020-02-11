@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Code < Banzai::Filter
           def call(input)
             input.gsub(/(?!.*snippet)```code(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
 
               if config['config']
                 configs = YAML.load_file("#{API.root}/config/code_examples.yml")
@@ -28,7 +30,7 @@ module Nexmo
               highlighted_source = highlight(code, lexer)
 
               <<~HEREDOC
-        <pre class="highlight #{lexer.tag}"><code>#{highlighted_source}</code></pre>
+                <pre class="highlight #{lexer.tag}"><code>#{highlighted_source}</code></pre>
               HEREDOC
             end
           end
@@ -50,7 +52,10 @@ module Nexmo
 
           def language_to_lexer(language)
             language = language_to_lexer_name(language)
-            return Rouge::Lexers::PHP.new({ start_inline: true }) if language == 'php'
+            if language == 'php'
+              return Rouge::Lexers::PHP.new(start_inline: true)
+            end
+
             Rouge::Lexer.find(language.downcase) || Rouge::Lexer.find('text')
           end
 

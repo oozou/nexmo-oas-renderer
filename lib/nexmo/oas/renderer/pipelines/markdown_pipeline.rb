@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'banzai'
 
 Dir[File.join(__dir__, '../filters', '*.rb')].each { |f| require_relative f }

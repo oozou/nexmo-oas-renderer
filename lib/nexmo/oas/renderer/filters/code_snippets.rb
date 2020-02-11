@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,8 +7,8 @@ module Nexmo
         class CodeSnippets < Banzai::Filter
           def call(input)
             input.gsub(/^(\s*)```code_snippets(.+?)```/m) do |_s|
-              @indentation = $1
-              @config = YAML.safe_load($2)
+              @indentation = Regexp.last_match(1)
+              @config = YAML.safe_load(Regexp.last_match(2))
               validate_config
               html
             end
@@ -80,6 +82,7 @@ module Nexmo
 
           def validate_config
             return if @config && @config['source']
+
             raise 'A source key must be present in this building_blocks config'
           end
 
@@ -87,7 +90,9 @@ module Nexmo
             source_path = "#{@config['source']}/*.yml"
 
             files = Dir[source_path]
-            raise "No .yml files found for #{@config['source']} code snippets" if files.empty?
+            if files.empty?
+              raise "No .yml files found for #{@config['source']} code snippets"
+            end
 
             files.map do |content_path|
               source = File.read(content_path)
@@ -113,7 +118,7 @@ module Nexmo
 
               parent_config = { 'code_only' => @config['code_only'], 'source' => @config['source'].gsub('_examples/', '') }
               if @config['application']
-                parent_config = parent_config.merge({ 'application' => @config['application'] })
+                parent_config = parent_config.merge('application' => @config['application'])
               end
 
               parent_config = parent_config.to_yaml.lines[1..-1].join
@@ -141,7 +146,9 @@ module Nexmo
 
             if options[:code_language]
               contents.each_with_index do |content, index|
-                active_index = index if content['language'] == options[:code_language].key
+                if content['language'] == options[:code_language].key
+                  active_index = index
+                end
               end
             end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Language < Banzai::Filter
           def call(input)
             input.gsub(/\[(.+?)\]\(lang:.+?(?:'(.+?)'|"(.+?)")\)/) do |_s|
-              "<span lang='#{$2}'>#{$1}</span>"
+              "<span lang='#{Regexp.last_match(2)}'>#{Regexp.last_match(1)}</span>"
             end
           end
         end

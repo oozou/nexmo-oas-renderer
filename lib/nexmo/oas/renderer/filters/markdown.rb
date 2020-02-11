@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/redcarpet'
 
 module Nexmo
@@ -16,17 +18,16 @@ module Nexmo
           end
 
           def markdown
-            @markdown ||= Redcarpet::Markdown.new(renderer, {
-              no_intra_emphasis: true,
-              tables: true,
-              strikethrough: true,
-              superscript: true,
-              underline: true,
-              highlight: true,
-              fenced_code_blocks: true,
-              disable_indented_code_blocks: true,
-              start_inline: true,
-            })
+            @markdown ||= Redcarpet::Markdown.new(renderer,
+                                                  no_intra_emphasis: true,
+                                                  tables: true,
+                                                  strikethrough: true,
+                                                  superscript: true,
+                                                  underline: true,
+                                                  highlight: true,
+                                                  fenced_code_blocks: true,
+                                                  disable_indented_code_blocks: true,
+                                                  start_inline: true)
           end
         end
 
@@ -38,6 +39,7 @@ module Nexmo
 
           def paragraph(text)
             return text if @options[:skip_paragraph_surround]
+
             "<p>#{text}</p>"
           end
 
@@ -68,7 +70,7 @@ module Nexmo
           end
 
           def list(contents, list_type)
-            if "#{list_type}" == 'unordered'
+            if list_type.to_s == 'unordered'
               '<ul class="Vlt-list Vlt-list--simple">' \
                 "#{contents}" \
                 '</ul>'

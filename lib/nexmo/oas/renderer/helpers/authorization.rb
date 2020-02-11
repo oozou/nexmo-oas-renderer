@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/protected_action'
 
 module Nexmo
@@ -5,7 +7,7 @@ module Nexmo
     module Renderer
       module Helpers
         module Authorization
-          def protect!(credentials={})
+          def protect!(credentials = {})
             return if authorized?
 
             guard = ::Nexmo::OAS::Renderer::ProtectedAction.new(

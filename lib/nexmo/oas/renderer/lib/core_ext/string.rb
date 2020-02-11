@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class String
   def render_markdown(options = {})
     Nexmo::OAS::Renderer::MarkdownPipeline.new(options).call(self).html_safe

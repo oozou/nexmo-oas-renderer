@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
       module Models
         class Tutorial
-
           include ActiveModel::Model
           attr_accessor :title, :description, :external_link, :products, :document_path, :languages
 
@@ -13,6 +14,7 @@ module Nexmo
 
           def path
             return external_link if external_link
+
             "/tutorials/#{document_path.relative_path_from(self.class.origin)}".gsub('.md', '')
           end
 
@@ -31,6 +33,7 @@ module Nexmo
             return 'Messages' if product == 'messages'
             return 'Dispatch' if product == 'dispatch'
             return 'Client SDK' if product == 'client-sdk'
+
             product.camelcase
           end
 
@@ -51,7 +54,7 @@ module Nexmo
           end
 
           def self.origin
-            Pathname.new("_tutorials")
+            Pathname.new('_tutorials')
           end
 
           def self.all
@@ -60,14 +63,14 @@ module Nexmo
               document = File.read(document_path)
               frontmatter = YAML.safe_load(document)
 
-              new({
+              new(
                 title: frontmatter['title'],
                 description: frontmatter['description'],
                 external_link: frontmatter['external_link'],
                 products: frontmatter['products'].split(',').map(&:strip),
                 languages: frontmatter['languages'] || [],
-                document_path: document_path,
-              })
+                document_path: document_path
+              )
             end
           end
 

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
       module Presenters
-
         class Versions
           def initialize(definition_name)
             @definition_name = definition_name
@@ -28,9 +29,11 @@ module Nexmo
                                       matches.map do |definition|
                                         name = definition.chomp('.yml')
                                         m = /\.v(\d+)/.match(name)
-                                        next { 'version' => '1', 'name' => name } unless m
-                                        { 'version' => m[1], 'name' => name }
+                                        unless m
+                                          next { 'version' => '1', 'name' => name }
+                                        end
 
+                                        { 'version' => m[1], 'name' => name }
                                       end.sort_by { |v| v['version'] }
                                     end
           end
@@ -43,7 +46,6 @@ module Nexmo
                              end
           end
         end
-
       end
     end
   end

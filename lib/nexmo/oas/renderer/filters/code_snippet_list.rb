@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'banzai'
 require_relative '../models/code_snippet'
@@ -9,7 +11,7 @@ module Nexmo
         class CodeSnippetList < Banzai::Filter
           def call(input)
             input.gsub(/```code_snippet_list(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
               @product = config['product']
               @blocks = Models::CodeSnippet.by_product(@product)
 

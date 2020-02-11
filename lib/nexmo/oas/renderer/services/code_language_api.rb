@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rouge'
 
 module Nexmo
@@ -8,17 +10,17 @@ module Nexmo
         attr_writer :weight, :linkable, :languages, :lexer
 
         def initialize(attributes = {})
-          @key          = attributes["key"]
-          @label        = attributes["label"]
-          @type         = attributes["type"]
-          @dependencies = attributes["dependencies"]
-          @unindent     = attributes["unindent"]
-          @icon         = attributes["icon"]
-          @run_command  = attributes["run_command"]
-          @lexer        = attributes["lexer"]
-          @languages    = attributes["languages"]
-          @weight       = attributes["weight"]
-          @linkable     = attributes["linkable"]
+          @key          = attributes['key']
+          @label        = attributes['label']
+          @type         = attributes['type']
+          @dependencies = attributes['dependencies']
+          @unindent     = attributes['unindent']
+          @icon         = attributes['icon']
+          @run_command  = attributes['run_command']
+          @lexer        = attributes['lexer']
+          @languages    = attributes['languages']
+          @weight       = attributes['weight']
+          @linkable     = attributes['linkable']
         end
 
         def weight
@@ -27,11 +29,13 @@ module Nexmo
 
         def linkable?
           return true if @linkable.nil?
+
           @linkable
         end
 
         def lexer
-          return Rouge::Lexers::PHP.new({ start_inline: true }) if @lexer == 'php'
+          return Rouge::Lexers::PHP.new(start_inline: true) if @lexer == 'php'
+
           Rouge::Lexer.find(@lexer) || Rouge::Lexer.find('text')
         end
 
@@ -64,8 +68,10 @@ module Nexmo
 
         def self.find(key)
           raise 'Key is missing' unless key
+
           code_language = all.detect { |lang| lang.key == key }
           raise "Language #{key} does not exist." unless code_language
+
           code_language
         end
 
@@ -85,7 +91,7 @@ module Nexmo
 
         private_class_method def self.where_type(type)
           config[type].map do |key, attributes|
-            new(attributes.merge({ "key" => key, "type" => type }))
+            new(attributes.merge('key' => key, 'type' => type))
           end
         end
 

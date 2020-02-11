@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -7,14 +9,16 @@ module Nexmo
             @input = input
 
             document.css('a').each_with_index do |link, _index|
-              if link['href']&.start_with?('http') && link['class'] && !link['class'].include?('no-external-marker')
-                link['target'] = '_blank'
-                if link.css('svg').empty?
-                  link.add_child <<~HEREDOC
-                    &nbsp;<svg class="Vlt-icon Vlt-icon--smaller Vlt-icon--text-bottom Vlt-blue-dark"><use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-open"></use></svg>
-                  HEREDOC
-                end
+              unless link['href']&.start_with?('http') && link['class'] && !link['class'].include?('no-external-marker')
+                next
               end
+
+              link['target'] = '_blank'
+              next unless link.css('svg').empty?
+
+              link.add_child <<~HEREDOC
+                &nbsp;<svg class="Vlt-icon Vlt-icon--smaller Vlt-icon--text-bottom Vlt-blue-dark"><use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-open"></use></svg>
+              HEREDOC
             end
 
             @document.to_html

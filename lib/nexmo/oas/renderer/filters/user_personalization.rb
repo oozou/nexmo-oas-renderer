@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -13,11 +15,11 @@ module Nexmo
               html = code.to_s
 
               html.gsub!(/(['|"])?NEXMO_API_(KEY|SECRET)['|"]?/) do
-                quote = $1 || "'"
+                quote = Regexp.last_match(1) || "'"
                 value = (
-                  case $2
-                when 'KEY' then options[:current_user].api_key
-                when 'SECRET' then options[:current_user].api_secret
+                  case Regexp.last_match(2)
+                  when 'KEY' then options[:current_user].api_key
+                  when 'SECRET' then options[:current_user].api_secret
                 end
                 )
                 "#{quote}#{value}#{quote}"

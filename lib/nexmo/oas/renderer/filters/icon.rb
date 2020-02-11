@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -9,7 +11,7 @@ module Nexmo
 
             input.gsub!(/\[icon="(.+?)"\]/) do
               <<~HEREDOC
-                <svg class="Vlt-green Vlt-icon Vlt-icon--small"><use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-#{$1}" /></svg>
+                <svg class="Vlt-green Vlt-icon Vlt-icon--small"><use xlink:href="/assets/symbol/volta-icons.svg#Vlt-icon-#{Regexp.last_match(1)}" /></svg>
               HEREDOC
             end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,10 +7,12 @@ module Nexmo
         class ConceptList < Banzai::Filter
           def call(input)
             input.gsub(/```concept_list(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
 
               raise 'concept_list filter takes a YAML config' if config.nil?
-              raise "concept_list filter requires 'product' or 'concepts' key" unless config['product'] || config['concepts']
+              unless config['product'] || config['concepts']
+                raise "concept_list filter requires 'product' or 'concepts' key"
+              end
 
               if config['product']
                 @product = config['product']

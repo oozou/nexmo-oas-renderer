@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -19,14 +21,14 @@ module Nexmo
 
               frontmatter = YAML.safe_load(document)
 
-              new({
+              new(
                 title: frontmatter['title'],
                 navigation_weight: frontmatter['navigation_weight'] || 999,
                 product: product,
                 document_path: document_path,
                 category: extract_category(document_path),
-                url: generate_url(document_path),
-              })
+                url: generate_url(document_path)
+              )
             end
 
             blocks.sort_by(&:navigation_weight)
@@ -66,7 +68,7 @@ module Nexmo
           end
 
           def self.origin
-            "_documentation"
+            '_documentation'
           end
         end
       end

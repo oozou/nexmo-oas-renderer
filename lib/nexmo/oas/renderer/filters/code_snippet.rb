@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'octicons_helper'
 
 module Nexmo
@@ -9,7 +11,7 @@ module Nexmo
 
           def call(input)
             input.gsub(/```single_code_snippet(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
 
               @renderer = get_renderer(config['language'])
 
@@ -43,17 +45,19 @@ module Nexmo
               end
 
               add_instructions = @renderer.add_instructions(config['file_name']).render_markdown
-              if config['code_only']
-                erb = File.read("#{API.root}/views/code_snippets/_code_only.html.erb")
-              else
-                erb = File.read("#{API.root}/views/code_snippets/_write_code.html.erb")
-              end
+              erb = if config['code_only']
+                      File.read("#{API.root}/views/code_snippets/_code_only.html.erb")
+                    else
+                      File.read("#{API.root}/views/code_snippets/_write_code.html.erb")
+                    end
 
               code_html = ERB.new(erb).result(binding)
 
               return code_html if config['code_only']
 
-              config['run_command'] = config['run_command'].gsub('{filename}', config['file_name']) if config['run_command']
+              if config['run_command']
+                config['run_command'] = config['run_command'].gsub('{filename}', config['file_name'])
+              end
               run_html = @renderer.run_command(config['run_command'], config['file_name'], config['code']['source']).to_s
 
               prereqs = (application_html + dependency_html + client_html).strip
@@ -72,7 +76,9 @@ module Nexmo
           def generate_code_block(language, input, unindent)
             filename = input['source']
             return '' unless input
-            raise "CodeSnippetFilter - Could not load #{filename} for language #{language}" unless File.exist?(filename)
+            unless File.exist?(filename)
+              raise "CodeSnippetFilter - Could not load #{filename} for language #{language}"
+            end
 
             code = File.read(filename)
             lexer = CodeLanguageAPI.find(language).lexer
@@ -124,11 +130,11 @@ module Nexmo
           def generate_dependencies(language, dependencies)
             # The only valid dependency for curl examples is `JWT`
             dependencies = dependencies.map(&:upcase)
-            if dependencies.include?('JWT')
-              title = 'Generate your JWT'
-            else
-              title = 'Install dependencies'
-            end
+            title = if dependencies.include?('JWT')
+                      'Generate your JWT'
+                    else
+                      'Install dependencies'
+                    end
             deps = @renderer.dependencies(dependencies)
             id = SecureRandom.hex
             erb = File.read("#{API.root}/views/code_snippets/_dependencies.html.erb")
@@ -147,11 +153,15 @@ module Nexmo
             # have a type set e.g audit
             app['type'] ||= 'voice'
 
-            if ['voice', 'rtc'].include? app['type']
-              app['event_url'] = "#{base_url}/webhooks/events" unless app['event_url']
-              app['answer_url'] = "#{base_url}/webhooks/answer" unless app['answer_url']
+            if %w[voice rtc].include? app['type']
+              unless app['event_url']
+                app['event_url'] = "#{base_url}/webhooks/events"
+              end
+              unless app['answer_url']
+                app['answer_url'] = "#{base_url}/webhooks/answer"
+              end
               erb = File.read("#{API.root}/views/code_snippets/_application_#{app['type']}.html.erb")
-            elsif ['messages', 'dispatch'].include? app['type']
+            elsif %w[messages dispatch].include? app['type']
               erb = File.read("#{API.root}/views/code_snippets/_application_messages_dispatch.html.erb")
             else
               raise "Invalid application type when creating code snippet: '#{app['type']}'"

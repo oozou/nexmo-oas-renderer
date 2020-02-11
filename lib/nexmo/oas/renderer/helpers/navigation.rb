@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
       module Helpers
         module Navigation
-
           HEADING_TAG_DEPTHS = {
             'h0' => 0,
             'h1' => 1,
@@ -11,7 +12,7 @@ module Nexmo
             'h3' => 3,
             'h4' => 4,
             'h5' => 5,
-            'h6' => 6,
+            'h6' => 6
           }.freeze
 
           def navigation_from_content(content:, title: nil)
@@ -58,7 +59,6 @@ module Nexmo
           def build_document(content)
             Nokogiri::HTML::DocumentFragment.parse(content)
           end
-
         end
       end
     end

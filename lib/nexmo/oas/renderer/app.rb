@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sinatra/base'
 require 'active_support'
 require 'active_support/core_ext/array/conversions'
@@ -24,13 +26,12 @@ module Nexmo
   module OAS
     module Renderer
       class API < Sinatra::Base
-
         Tilt.register Tilt::ERBTemplate, 'html.erb'
 
-        view_paths = [views, Rails.root.join("app", "views")]
+        view_paths = [views, Rails.root.join('app', 'views')]
         set :views, view_paths
 
-        set :mustermann_opts, { type: :rails }
+        set :mustermann_opts, type: :rails
         set :oas_path, (
           ENV['OAS_PATH'] ||
             Rails.application.try(:credentials).try(:fetch, :oas_path, './')
@@ -67,7 +68,7 @@ module Nexmo
           extensions = extension.split('.')
           case extensions.size
           when 1
-            { definition: extensions.first}
+            { definition: extensions.first }
           when 2
             if extensions.second.match?(/v\d+/)
               { definition: extensions.first, version: extensions.second }
@@ -96,6 +97,7 @@ module Nexmo
 
         def set_code_language
           return if params[:code_language] == 'templates'
+
           @code_language = params[:code_language]
         end
 
@@ -115,7 +117,7 @@ module Nexmo
 
           @specification = Presenters::OpenApiSpecification.new(
             definition_name: definition,
-            expand_responses: params.fetch(:expandResponses, nil),
+            expand_responses: params.fetch(:expandResponses, nil)
           )
 
           erb :'open_api/show', layout: :'layouts/open_api'

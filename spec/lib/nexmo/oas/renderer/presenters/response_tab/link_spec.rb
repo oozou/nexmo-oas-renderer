@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'nexmo/oas/renderer/presenters/response_tab/link'
 
 RSpec.describe Nexmo::OAS::Renderer::Presenters::ResponseTab::Link do

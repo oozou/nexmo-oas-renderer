@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'oas_parser'
 require 'nexmo/oas/renderer/presenters/response_tabs'
 require 'nexmo/oas/renderer/presenters/response_tab/link'

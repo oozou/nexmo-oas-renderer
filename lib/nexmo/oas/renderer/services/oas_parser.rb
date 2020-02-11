@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'oas_parser'
 
 module OasParser
@@ -32,14 +34,12 @@ module OasParser
       security_schemes.any?(&:jwt?)
     end
 
-    alias_method :original_security_schemes, :security_schemes
+    alias original_security_schemes security_schemes
 
     def security_schemes
       security_schemes = security.flat_map(&:keys)
 
-      if definition
-        security_schemes = security_schemes + definition.security.flat_map(&:keys)
-      end
+      security_schemes += definition.security.flat_map(&:keys) if definition
 
       security_schemes = security_schemes.uniq
 
@@ -58,7 +58,7 @@ module OasParser
       security_schema_parameter_defaults = {
         'type' => 'string',
         'example' => 'abc123',
-        'default' => false,
+        'default' => false
       }
 
       raw_security_schema_parameters.map do |definition|

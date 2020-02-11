@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,9 +7,9 @@ module Nexmo
         class Tab < Banzai::Filter
           def call(input)
             input.gsub(/^(\s*)```tabbed_(examples|content)(.+?)```/m) do |_s|
-              @indentation = $1
-              @mode = $2
-              @config = YAML.safe_load($3)
+              @indentation = Regexp.last_match(1)
+              @mode = Regexp.last_match(2)
+              @config = YAML.safe_load(Regexp.last_match(3))
               validate_config
               html
             end
@@ -36,7 +38,7 @@ module Nexmo
             tab_link = Nokogiri::XML::Element.new 'span', @document
             if content[:language]
               # We don't currently have icons for JSON/XML
-              if ['json', 'xml'].include? content[:language].key.downcase
+              if %w[json xml].include? content[:language].key.downcase
                 tab_link.content = content[:tab_title]
               elsif content[:language].key == 'objective_c' || content[:language].key == 'swift'
                 tab_link.inner_html = '<svg><use xlink:href="/assets/images/brands/ios.svg#ios" /></svg><span>' + content[:tab_title] + '</span>'
@@ -122,6 +124,7 @@ module Nexmo
 
           def validate_config
             return if @config && (@config['source'] || @config['tabs'])
+
             raise 'Source or tabs must be present in this tabbed_example config'
           end
 
@@ -131,14 +134,20 @@ module Nexmo
             source_path += '/*.md' if tabbed_content?
 
             files = Dir[source_path]
-            raise "Empty content_from_source file list in #{source_path}" if files.empty?
+            if files.empty?
+              raise "Empty content_from_source file list in #{source_path}"
+            end
+
             files.map do |content_path|
-              raise "Could not find content_from_source file: #{content_path}" unless File.exist? content_path
+              unless File.exist? content_path
+                raise "Could not find content_from_source file: #{content_path}"
+              end
+
               source = File.read(content_path)
 
               content = {
                 id: SecureRandom.hex,
-                source: source,
+                source: source
               }
 
               if tabbed_code_examples?
@@ -161,14 +170,17 @@ module Nexmo
           def content_from_tabs
             @config['tabs'].map do |title, config|
               file_path = config['source']
-              raise "Could not find content_from_tabs file: #{config['source']}" unless File.exist? file_path
+              unless File.exist? file_path
+                raise "Could not find content_from_tabs file: #{config['source']}"
+              end
+
               source = File.read(file_path)
 
-              config.symbolize_keys.merge({
+              config.symbolize_keys.merge(
                 id: SecureRandom.hex,
                 source: source,
-                language_key: title.dup.downcase,
-              })
+                language_key: title.dup.downcase
+              )
             end
           end
 
@@ -209,20 +221,23 @@ module Nexmo
                 <pre class="highlight #{content[:language_key]}"><code>#{highlighted_source}</code></pre>
               HEREDOC
 
-              content.merge!({ body: body })
+              content.merge!(body: body)
             end
           end
 
           def resolve_tab_title(contents)
             contents.map do |content|
-              content.merge!({ tab_title: content[:language].label })
+              content.merge!(tab_title: content[:language].label)
             end
           end
 
           def sort_contents(contents)
             contents.sort_by do |content|
               next content[:language].weight if content[:language]
-              next content[:frontmatter]['menu_weight'] || 999 if content[:frontmatter]
+              if content[:frontmatter]
+                next content[:frontmatter]['menu_weight'] || 999
+              end
+
               999
             end
           end
@@ -233,7 +248,9 @@ module Nexmo
             if options[:code_language]
               contents.each_with_index do |content, index|
                 %i[language_key platform_key].each do |key|
-                  active_index = index if content[key] == options[:code_language].key
+                  if content[key] == options[:code_language].key
+                    active_index = index
+                  end
                 end
               end
             end

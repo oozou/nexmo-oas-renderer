@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -7,7 +9,7 @@ module Nexmo
             input.gsub(/```js_sequence_diagram(.+?)```/m) do |_s|
               diagram = <<~HEREDOC
                 <div class="js-diagram">
-                  #{$1}
+                  #{Regexp.last_match(1)}
                 </div>
               HEREDOC
 

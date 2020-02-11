@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -7,7 +9,7 @@ module Nexmo
             input.gsub(/[u{🔈}]\[(.+?)\]/) do
               audio = <<~HEREDOC
                 <audio controls>
-                  <source src="#{$1}" type="audio/mpeg">
+                  <source src="#{Regexp.last_match(1)}" type="audio/mpeg">
                 </audio>
               HEREDOC
 

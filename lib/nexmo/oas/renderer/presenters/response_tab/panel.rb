@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -22,9 +24,9 @@ module Nexmo
 
             def content
               if @content == :responses
-                Nexmo::OAS::Renderer::ResponseParserDecorator.
-                  new(@schema).
-                  html(@format, xml_options: @schema['xml'])
+                Nexmo::OAS::Renderer::ResponseParserDecorator
+                  .new(@schema)
+                  .html(@format, xml_options: @schema['xml'])
               else
                 [:'open_api/_response_fields', locals: {
                   schema: @schema,

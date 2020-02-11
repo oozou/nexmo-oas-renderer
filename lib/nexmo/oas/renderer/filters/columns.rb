@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -6,11 +8,11 @@ module Nexmo
           def call(input)
             input.gsub!(%r{{column\:([1-4])\/([1-4])}\n(.+?){end}}m) do
               s = []
-              s << row_start if $1 == '1'
-              s << column_start($2)
-              s << $3
+              s << row_start if Regexp.last_match(1) == '1'
+              s << column_start(Regexp.last_match(2))
+              s << Regexp.last_match(3)
               s << column_end
-              s << row_end if $1 == $2
+              s << row_end if Regexp.last_match(1) == Regexp.last_match(2)
               s.join('')
             end
 

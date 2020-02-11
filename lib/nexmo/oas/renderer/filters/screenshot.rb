@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Screenshot < Banzai::Filter
           def call(input)
             input.gsub(/```screenshot(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
               if config['image'] && File.file?(config['image'])
                 "![Screenshot](#{config['image'].gsub('public', '')})"
               else

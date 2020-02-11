@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Label < Banzai::Filter
           def call(input)
             input.gsub(/\[(GET|POST|PUT|DELETE|OPTIONS)\]/i) do |_s|
-              "<span class='Vlt-badge #{class_name($1)}'>#{$1}</span> "
+              "<span class='Vlt-badge #{class_name(Regexp.last_match(1))}'>#{Regexp.last_match(1)}</span> "
             end
           end
 

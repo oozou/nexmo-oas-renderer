@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Partial < Banzai::Filter
           def call(input)
             input.gsub(/```partial(.+?)```/m) do |_s|
-              config = YAML.safe_load($1)
+              config = YAML.safe_load(Regexp.last_match(1))
               content = File.read(config['source'])
 
               active = options[:code_language] ? options[:code_language].key == config['platform'] : false

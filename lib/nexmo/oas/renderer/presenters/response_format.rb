@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -6,8 +8,8 @@ module Nexmo
           MAPPINGS = {
             'application/json' => 'JSON',
             'application/xml' => 'XML',
-            'text/xml' => 'XML',
-          }
+            'text/xml' => 'XML'
+          }.freeze
 
           def self.to_dropdown(formats)
             MAPPINGS.slice(*formats)

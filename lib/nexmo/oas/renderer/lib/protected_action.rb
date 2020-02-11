@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # USAGE
 #
 # get '/' do
@@ -10,8 +12,9 @@ module Nexmo
       class ProtectedAction
         attr_reader :credentials, :context
 
-        def initialize(context, credentials={})
-          @credentials, @context = credentials, context
+        def initialize(context, credentials = {})
+          @credentials = credentials
+          @context = context
         end
 
         def check!
@@ -27,17 +30,17 @@ module Nexmo
         private
 
         def authorize(username, password)
-          credentials[:username] == username and credentials[:password] == password
+          (credentials[:username] == username) && (credentials[:password] == password)
         end
 
         def unauthorized!
           context.headers['WWW-Authenticate'] =
             %(Basic realm="#{credentials[:realm]}")
-          throw :halt, [ 401, 'Authorization Required' ]
+          throw :halt, [401, 'Authorization Required']
         end
 
         def bad_request!
-          throw :halt, [ 400, 'Bad Request' ]
+          throw :halt, [400, 'Bad Request']
         end
 
         def auth

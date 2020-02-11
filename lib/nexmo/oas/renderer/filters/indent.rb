@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -5,7 +7,7 @@ module Nexmo
         class Indent < Banzai::Filter
           def call(input)
             input.gsub(/^^\s{4}\-\>\s(.+?)$/) do
-              body = MarkdownPipeline.new.call($1)
+              body = MarkdownPipeline.new.call(Regexp.last_match(1))
               <<~HEREDOC
                 <div class="indent">
                   #{body}

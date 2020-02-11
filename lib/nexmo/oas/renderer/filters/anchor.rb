@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Nexmo
   module OAS
     module Renderer
@@ -6,7 +8,7 @@ module Nexmo
           def call(input)
             input.gsub(/^[\u{2693}](.+?)\n/) do
               <<~HEREDOC
-                <a name="#{$1.parameterize}"></a>
+                <a name="#{Regexp.last_match(1).parameterize}"></a>
               HEREDOC
             end
           end

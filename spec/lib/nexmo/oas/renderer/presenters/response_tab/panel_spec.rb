@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'nexmo/oas/renderer/presenters/response_tab/panel'
 require 'nexmo/oas/renderer/decorators/response_parser_decorator'
 
@@ -51,9 +53,9 @@ RSpec.describe Nexmo::OAS::Renderer::Presenters::ResponseTab::Panel do
 
       it 'returns the response fields' do
         expect(subject.content).to eq([
-          :'open_api/_response_fields',
-          locals: { schema: schema, index: index, format: format, endpoint: endpoint }
-        ])
+                                        :'open_api/_response_fields',
+                                        locals: { schema: schema, index: index, format: format, endpoint: endpoint }
+                                      ])
       end
     end
   end
