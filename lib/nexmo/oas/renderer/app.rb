@@ -10,6 +10,7 @@ require_relative './presenters/api_specification'
 require_relative './presenters/open_api_specification'
 require_relative './presenters/navigation'
 require_relative './presenters/response_tabs'
+require_relative './helpers/authorization'
 require_relative './helpers/render'
 require_relative './helpers/navigation'
 require_relative './helpers/summary'
@@ -30,14 +31,32 @@ module Nexmo
         set :views, view_paths
 
         set :mustermann_opts, { type: :rails }
-        require 'pry'; binding.pry
         set :oas_path, (
           ENV['OAS_PATH'] ||
             Rails.application.try(:credentials).try(:fetch, :oas_path, './')
         )
         set :bind, '0.0.0.0'
+        set :protect_with_basic_auth, (
+          ENV['OAS_ENABLE_BASIC_AUTH'].present? ||
+            Rails.application.try(:credentials).try(
+              :fetch, :oas_enable_basic_auth, false
+            ).present?
+        )
+        set :oas_username, (
+          ENV['OAS_USERNAME'] ||
+            Rails.application.try(:credentials).try(
+              :fetch, :oas_username, nil
+            ) || (raise 'No basic auth username' if protect_with_basic_auth?)
+        )
+        set :oas_password, (
+          ENV['OAS_PASSWORD'] ||
+          Rails.application.try(:credentials).try(
+            :fetch, :oas_password, nil
+          ) || (raise 'No basic auth password' if protect_with_basic_auth?)
+        )
 
         helpers do
+          include Helpers::Authorization
           include Helpers::Render
           include Helpers::Navigation
           include Helpers::Summary
@@ -85,6 +104,9 @@ module Nexmo
         end
 
         get '(/api)/*definition' do
+          if API.protect_with_basic_auth?
+            protect!(username: API.oas_username, password: API.oas_password)
+          end
 
           parameters = parse_params(params[:definition])
           definition = [
