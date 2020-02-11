@@ -4,18 +4,18 @@ require 'active_support/core_ext/array/conversions'
 require 'active_support/core_ext/string/output_safety'
 require 'active_model'
 
-require_relative'./decorators/response_parser_decorator'
-require_relative'./pipelines/markdown_pipeline'
-require_relative'./presenters/api_specification'
-require_relative'./presenters/open_api_specification'
-require_relative'./presenters/navigation'
-require_relative'./presenters/response_tabs'
-require_relative'./helpers/render'
-require_relative'./helpers/navigation'
-require_relative'./helpers/summary'
-require_relative'./helpers/url'
+require_relative './decorators/response_parser_decorator'
+require_relative './pipelines/markdown_pipeline'
+require_relative './presenters/api_specification'
+require_relative './presenters/open_api_specification'
+require_relative './presenters/navigation'
+require_relative './presenters/response_tabs'
+require_relative './helpers/render'
+require_relative './helpers/navigation'
+require_relative './helpers/summary'
+require_relative './helpers/url'
 require_relative './services/code_language_api'
-require_relative'./lib/core_ext/string'
+require_relative './lib/core_ext/string'
 
 require 'dotenv/load'
 
@@ -33,8 +33,7 @@ module Nexmo
         require 'pry'; binding.pry
         set :oas_path, (
           ENV['OAS_PATH'] ||
-            Rails.application.try(:credentials).try(:fetch, :oas_path, nil) ||
-            './'
+            Rails.application.try(:credentials).try(:fetch, :oas_path, './')
         )
         set :bind, '0.0.0.0'
 
@@ -51,24 +50,20 @@ module Nexmo
           when 1
             { definition: extensions.first}
           when 2
-            if extensions.second.match? /v\d+/
+            if extensions.second.match?(/v\d+/)
               { definition: extensions.first, version: extensions.second }
             else
               { definition: extensions.first, format: extensions.second }
             end
           when 3
-            { definition: extensions.first, version: extensions.second, format: extensions.last }
+            {
+              definition: extensions.first,
+              version: extensions.second,
+              format: extensions.last
+            }
           else
             {}
           end
-        end
-
-        def check_redirect!
-          return
-        end
-
-        def check_oas_constraints!(definition)
-          return
         end
 
         error Errno::ENOENT do
@@ -90,53 +85,18 @@ module Nexmo
         end
 
         get '(/api)/*definition' do
-          check_redirect!
 
           parameters = parse_params(params[:definition])
-          definition = [parameters[:definition], parameters[:version]].compact.join('.')
-          check_oas_constraints!(definition)
+          definition = [
+            parameters[:definition], parameters[:version]
+          ].compact.join('.')
 
           @specification = Presenters::OpenApiSpecification.new(
             definition_name: definition,
             expand_responses: params.fetch(:expandResponses, nil),
           )
 
-          if ['yml', 'json'].include?(parameters[:format])
-            send_file @specification.definition.path, disposition: :attachment
-          else
-            erb :'open_api/show', layout: :'layouts/open_api'
-          end
-        end
-
-        def set_document
-          if params[:code_language] == 'templates'
-            @document = 'verify/templates'
-          elsif params[:code_language] == 'ncco'
-            @document = 'voice/ncco'
-          elsif CodeLanguage.exists?(params[:code_language])
-            @document = params[:document]
-          else
-            @document = "#{params[:document]}/#{params[:code_language]}"
-          end
-        end
-
-        get '(/api)/*document(/:code_language)' do
-          set_document
-
-          @specification = Presenters::ApiSpecification.new(
-            document_name: @document,
-            code_language: @code_language
-          )
-
-          @navigation = Presenters::Navigation.new(
-            content: @specification.content,
-            title: @specification.side_navigation_title,
-          )
-
-          @content = @navigation.content
-          @side_navigation_title = @navigation.title
-
-          erb :'api/show', layout: :'layouts/api.html'
+          erb :'open_api/show', layout: :'layouts/open_api'
         end
       end
     end
